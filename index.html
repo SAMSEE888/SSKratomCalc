@@ -1,0 +1,314 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เครื่องคำนวณวัตถุดิบน้ำกระท่อม</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap');
+
+        body {
+            background-color: #1a1a1a;
+            color: #b3ffb3;
+            font-family: 'Kanit', sans-serif;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .calculator-container {
+            background: linear-gradient(145deg, #222, #000);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 8px 8px 16px #0a0a0a, -8px -8px 16px #343434;
+            width: 90%;
+            max-width: 550px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #80ff80;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px #004d00;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            color: #c2ffc2;
+            text-align: left;
+        }
+
+        input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background-color: #333;
+            color: #d9ffd9;
+            font-size: 1em;
+            box-sizing: border-box;
+            text-align: center;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(to right, #00cc00, #008000);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 0 10px;
+        }
+
+        button.reset {
+            background: linear-gradient(to right, #ff4d4d, #cc0000);
+        }
+
+        button:hover {
+            filter: brightness(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .result-container {
+            margin-top: 30px;
+            background-color: rgba(0, 51, 0, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 4px 4px 8px rgba(0, 26, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        .result-container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .result-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: rgba(0, 51, 0, 0.3);
+            border: 1px solid rgba(0, 153, 0, 0.2);
+        }
+
+        .result-section h3 {
+            color: #a3ffa3;
+            margin-top: 0;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px #003300;
+            border-bottom: 2px solid rgba(0, 153, 0, 0.5);
+            padding-bottom: 5px;
+        }
+
+        .result-item {
+            margin-bottom: 8px;
+            color: #c2ffc2;
+            font-size: 1.05em;
+        }
+
+        .note {
+            color: #8cff8c;
+            font-size: 0.9em;
+            margin-top: 15px;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="calculator-container">
+        <h1>เครื่องคำนวณวัตถุดิบน้ำกระท่อม</h1>
+
+        <div class="input-group">
+            <label for="leafInput">ปริมาณใบกระท่อม (กก.):</label>
+            <input type="number" id="leafInput" placeholder="ระบุ (กก.)" min="0">
+        </div>
+
+        <div class="input-group">
+            <label for="waterInput">ปริมาณน้ำ (ลิตร):</label>
+            <input type="number" id="waterInput" placeholder="ระบุ (ลิตร)" min="0">
+        </div>
+
+        <div class="input-group">
+            <label for="yieldInput">ปริมาณน้ำกระท่อมดิบที่ต้องการ (ลิตร):</label>
+            <input type="number" id="yieldInput" placeholder="ระบุ (ลิตร)" min="0">
+        </div>
+
+        <button id="calculateButton">คำนวณ</button>
+        <button id="resetButton" class="reset">รีเซ็ต</button>
+
+        <div class="result-container" id="resultContainer">
+            <h2>ผลลัพธ์การคำนวณ</h2>
+
+            <div class="result-section">
+                <h3>แบบบดใบกระท่อม</h3>
+                <p class="result-item" id="resultGroundLeaf"></p>
+                <p class="result-item" id="resultGroundWater"></p>
+                <p class="result-item" id="resultGroundYield"></p>
+            </div>
+
+            <div class="result-section">
+                <h3>แบบไม่บดใบ ( # 0.65 # )</h3>
+                <p class="result-item" id="resultNotGroundLeaf1"></p>
+                <p class="result-item" id="resultNotGroundWater1"></p>
+                <p class="result-item" id="resultNotGroundYield1"></p>
+            </div>
+
+            <div class="result-section">
+                <h3>แบบไม่บด ( # 0.66 # ) </h3>
+                <p class="result-item" id="resultNotGroundLeaf2"></p>
+                <p class="result-item" id="resultNotGroundWater2"></p>
+                <p class="result-item" id="resultNotGroundYield2"></p>
+            </div>
+        </div>
+
+        <p class="note">**หมายเหตุ:** อัตราส่วนเหล่านี้เป็นค่าเฉพาะของ : SS789.Kratom # ส.สามสี # :</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const leafInput = document.getElementById('leafInput');
+            const waterInput = document.getElementById('waterInput');
+            const yieldInput = document.getElementById('yieldInput');
+            const calculateButton = document.getElementById('calculateButton');
+            const resetButton = document.getElementById('resetButton');
+            const resultContainer = document.getElementById('resultContainer');
+
+            const resultGroundLeaf = document.getElementById('resultGroundLeaf');
+            const resultGroundWater = document.getElementById('resultGroundWater');
+            const resultGroundYield = document.getElementById('resultGroundYield');
+
+            const resultNotGroundLeaf1 = document.getElementById('resultNotGroundLeaf1');
+            const resultNotGroundWater1 = document.getElementById('resultNotGroundWater1');
+            const resultNotGroundYield1 = document.getElementById('resultNotGroundYield1');
+
+            const resultNotGroundLeaf2 = document.getElementById('resultNotGroundLeaf2');
+            const resultNotGroundWater2 = document.getElementById('resultNotGroundWater2');
+            const resultNotGroundYield2 = document.getElementById('resultNotGroundYield2');
+
+            calculateButton.addEventListener('click', function() {
+                const leaf = parseFloat(leafInput.value) || 0;
+                const water = parseFloat(waterInput.value) || 0;
+                const yieldDesired = parseFloat(yieldInput.value) || 0;
+
+                if (leaf < 0 || water < 0 || yieldDesired < 0) {
+                    alert('⚠️ กรุณากรอกค่าที่เป็นบวกเท่านั้น!');
+                    return;
+                }
+
+                let groundLeaf = 0, groundWater = 0, groundYield = 0;
+                let notGroundLeaf1 = 0, notGroundWater1 = 0, notGroundYield1 = 0;
+                let notGroundLeaf2 = 0, notGroundWater2 = 0, notGroundYield2 = 0;
+
+                // อัตราส่วนสำหรับวิธีบด
+                const groundRatioLeafToWater = 20; // กก. ใบ : ลิตร น้ำ
+                const groundRatioWaterToYield = 15 / 20; // ลิตร น้ำ : ลิตร น้ำกระท่อมดิบ
+
+                // อัตราส่วนสำหรับวิธีไม่บด ( # 0.65 # )
+                const notGroundRatioLeafToWater1 = 15.38; // กก. ใบ : ลิตร น้ำ
+                const notGroundRatioWaterToYield1 = 12 / 15.38; // ลิตร น้ำ : ลิตร น้ำกระท่อมดิบ
+
+                // อัตราส่วนสำหรับวิธีไม่บด ( # 0.66 # )
+                const notGroundRatioLeafToWater2 = 15.15151515; // กก. ใบ : ลิตร น้ำ
+                const notGroundRatioWaterToYield2 = 12 / 15.15151515; // ลิตร น้ำ : ลิตร น้ำกระท่อมดิบ
+
+                if (leaf > 0) {
+                    groundLeaf = leaf;
+                    groundWater = leaf * groundRatioLeafToWater;
+                    groundYield = groundWater * groundRatioWaterToYield;
+
+                    notGroundLeaf1 = leaf;
+                    notGroundWater1 = leaf * notGroundRatioLeafToWater1;
+                    notGroundYield1 = notGroundWater1 * notGroundRatioWaterToYield1;
+
+                    notGroundLeaf2 = leaf;
+                    notGroundWater2 = leaf * notGroundRatioLeafToWater2;
+                    notGroundYield2 = notGroundWater2 * notGroundRatioWaterToYield2;
+
+                } else if (water > 0) {
+                    groundWater = water;
+                    groundLeaf = water / groundRatioLeafToWater;
+                    groundYield = water * groundRatioWaterToYield;
+
+                    notGroundWater1 = water;
+                    notGroundLeaf1 = water / notGroundRatioLeafToWater1;
+                    notGroundYield1 = water * notGroundRatioWaterToYield1;
+
+                    notGroundWater2 = water;
+                    notGroundLeaf2 = water / notGroundRatioLeafToWater2;
+                    notGroundYield2 = water * notGroundRatioWaterToYield2;
+
+                } else if (yieldDesired > 0) {
+                    groundYield = yieldDesired;
+                    groundWater = yieldDesired / groundRatioWaterToYield;
+                    groundLeaf = groundWater / groundRatioLeafToWater;
+
+                    notGroundYield1 = yieldDesired;
+                    notGroundWater1 = yieldDesired / notGroundRatioWaterToYield1;
+                    notGroundLeaf1 = notGroundWater1 / notGroundRatioLeafToWater1;
+
+                    notGroundYield2 = yieldDesired;
+                    notGroundWater2 = yieldDesired / notGroundRatioWaterToYield2;
+                    notGroundLeaf2 = notGroundWater2 / notGroundRatioLeafToWater2;
+
+                } else {
+                    alert('⚠️ กรุณากรอกค่าข้อมูลอย่างน้อยหนึ่งช่อง!');
+                    return;
+                }
+
+                resultGroundLeaf.textContent = `ใบกระท่อม: ${groundLeaf.toFixed(2)} กก.`;
+                resultGroundWater.textContent = `น้ำ: ${groundWater.toFixed(2)} ลิตร`;
+                resultGroundYield.textContent = `น้ำกระท่อมดิบ: ${groundYield.toFixed(2)} ลิตร`;
+
+                resultNotGroundLeaf1.textContent = `ใบกระท่อม: ${notGroundLeaf1.toFixed(2)} กก.`;
+                resultNotGroundWater1.textContent = `น้ำ: ${notGroundWater1.toFixed(2)} ลิตร`;
+                resultNotGroundYield1.textContent = `น้ำกระท่อมดิบ: ${notGroundYield1.toFixed(2)} ลิตร`;
+
+                resultNotGroundLeaf2.textContent = `ใบกระท่อม: ${notGroundLeaf2.toFixed(2)} กก.`;
+                resultNotGroundWater2.textContent = `น้ำ: ${notGroundWater2.toFixed(2)} ลิตร`;
+                resultNotGroundYield2.textContent = `น้ำกระท่อมดิบ: ${notGroundYield2.toFixed(2)} ลิตร`;
+
+                resultContainer.classList.add('show');
+            });
+
+            resetButton.addEventListener('click', function() {
+                leafInput.value = '';
+                waterInput.value = '';
+                yieldInput.value = '';
+                resultContainer.classList.remove('show');
+            });
+        });
+    </script>
+
+</body>
+
+</html>
+
